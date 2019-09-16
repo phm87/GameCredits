@@ -2938,7 +2938,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
             + HelpExampleRpc("listunspent", "10000, 6, 9999999, [] , true, { \"minimumAmount\": 0.005 } ")
         );
 
-    CAmount nAmount = 10000;
+    CAmount nAmount = 100000;
     if (request.params.size() > 0 && !request.params[0].isNull()) {
         RPCTypeCheckArgument(request.params[0], UniValue::VNUM);
         nAmount = AmountFromValue(request.params[0].get_int());
@@ -2978,8 +2978,8 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
         include_unsafe = request.params[4].get_bool();
     }
 
-    CAmount nMinimumAmount = nAmount;
-    CAmount nMaximumAmount = nAmount;
+    CAmount nMinimumAmount = nAmount - 10;
+    CAmount nMaximumAmount = nAmount + 10;
     CAmount nMinimumSumAmount = MAX_MONEY;
     uint64_t nMaximumCount = 1;
 
