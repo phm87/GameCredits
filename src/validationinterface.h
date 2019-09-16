@@ -34,6 +34,7 @@ class CValidationInterface {
 protected:
     /** Notifies listeners of updated block chain tip */
     virtual void UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {}
+    virtual void EraseFromWallet(const uint256 &hash) {}
     /** Notifies listeners of a transaction having been added to mempool. */
     virtual void TransactionAddedToMempool(const CTransactionRef &ptxn) {}
     /**
@@ -81,6 +82,8 @@ public:
     void UnregisterBackgroundSignalScheduler();
     /** Call any remaining callbacks on the calling thread */
     void FlushBackgroundCallbacks();
+    /** Notifies listeners of an erased transaction (currently disabled, requires transaction replacement). */
+    void EraseTransaction(const uint256 &hash);
 
     void UpdatedBlockTip(const CBlockIndex *, const CBlockIndex *, bool fInitialDownload);
     void TransactionAddedToMempool(const CTransactionRef &);
@@ -88,7 +91,7 @@ public:
     void BlockDisconnected(const std::shared_ptr<const CBlock> &);
     void SetBestChain(const CBlockLocator &);
     void Inventory(const uint256 &);
-    void Broadcast(int64_t nBestBlockTime, CConnman* connman);
+    void Broadcast(int64_t n1BestBlockTime, CConnman* connman);
     void BlockChecked(const CBlock&, const CValidationState&);
     void NewPoWValidBlock(const CBlockIndex *, const std::shared_ptr<const CBlock>&);
 };
