@@ -2963,7 +2963,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
         const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
         bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
-        if (setAddress.size() && (!fValidAddress || !setAddress.count(address)))
+        if (!fValidAddress || setAddress != address)
             continue;
 
         UniValue entry(UniValue::VOBJ);
