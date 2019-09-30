@@ -26,7 +26,7 @@
 #include "wallet/feebumper.h"
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
-#include <primitives/transaction.h>
+#include "key_io.h"
 
 #include <stdint.h>
 
