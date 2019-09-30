@@ -2963,7 +2963,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
         const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
         bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
-        LogPrintf("we got one uxto\n");
+        LogPrintf("we got one uxto %s %s\n", CBitcoinAddress(setAddress).ToString(), CBitcoinAddress(address).ToString());
         if (!fValidAddress || setAddress != address)
             continue;
 LogPrintf("we still got the uxto\n");
