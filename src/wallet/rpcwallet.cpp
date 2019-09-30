@@ -2909,7 +2909,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
 
     CTxDestination setAddress;
     if (request.params.size() > 1 && !request.params[1].isNull()) {
-        if (!IsValidDestination(setAddress = DecodeDestination(request.params[1].get_str())))
+        if (setAddress = DecodeDestination(request.params[1].get_str()))
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid gamecredits address: ")+request.params[1].get_str());
     }
             
