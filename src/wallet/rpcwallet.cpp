@@ -2904,7 +2904,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
     CAmount nAmount = 100000;
     if (request.params.size() > 0 && !request.params[0].isNull()) {
         RPCTypeCheckArgument(request.params[0], UniValue::VNUM);
-        nAmount = AmountFromValue(request.params[0].get_int());
+        nAmount = request.params[0].get_int();
     }
 
     CTxDestination setAddress;
