@@ -2906,7 +2906,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
         nAmount = AmountFromValue(request.params[0].get_int());
     }
 
-    CBitcoinAddress setAddress;
+    CTxDestination setAddress;
     if (request.params.size() > 1 && !request.params[1].isNull()) {
         setAddress = DecodeDestination(request.params[1].get_str());
         if (!setAddress.IsValid())
