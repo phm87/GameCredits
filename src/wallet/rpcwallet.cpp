@@ -2884,7 +2884,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-    if (request.fHelp || request.params.size() > 5)
+    if (request.fHelp || request.params.size() < 2)
         throw std::runtime_error(
             "dpowlistunspent ( minconf maxconf  [\"addresses\",...] [include_unsafe] [query_options])\n"
             "\nReturns array of one unspent transaction output\n"
@@ -2892,50 +2892,12 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
             "Optionally filter to only include txouts paid to specified addresses.\n"
             "\nArguments:\n"
             "1. amount           (numeric, optional, default=1) The utxo amount to filter\n"
-            "2. \"addresses\"      (string) A json array of gamecredits addresses to filter\n"
-            "    [\n"
-            "      \"address\"     (string) gamecredits address\n"
-            "      ,...\n"
-            "    ]\n"
-            "3. minconf          (numeric, optional, default=1) The minimum confirmations to filter\n"
-            "4. maxconf          (numeric, optional, default=9999999) The maximum confirmations to filter\n"
-
-            "5. include_unsafe (bool, optional, default=true) Include outputs that are not safe to spend\n"
-            "                  See description of \"safe\" attribute below.\n"
-            "6. query_options    (json, optional) JSON with query options\n"
-            "    {\n"
-            "      \"minimumAmount\"    (numeric or string, default=0) Minimum value of each UTXO in " + CURRENCY_UNIT + "\n"
-            "      \"maximumAmount\"    (numeric or string, default=unlimited) Maximum value of each UTXO in " + CURRENCY_UNIT + "\n"
-            "      \"maximumCount\"     (numeric or string, default=unlimited) Maximum number of UTXOs\n"
-            "      \"minimumSumAmount\" (numeric or string, default=unlimited) Minimum sum value of all UTXOs in " + CURRENCY_UNIT + "\n"
-            "    }\n"
-            "\nResult\n"
-            "[                   (array of json object)\n"
-            "  {\n"
-            "    \"txid\" : \"txid\",          (string) the transaction id \n"
-            "    \"vout\" : n,               (numeric) the vout value\n"
-            "    \"address\" : \"address\",    (string) the gamecredits address\n"
-            "    \"account\" : \"account\",    (string) DEPRECATED. The associated account, or \"\" for the default account\n"
-            "    \"scriptPubKey\" : \"key\",   (string) the script key\n"
-            "    \"amount\" : x.xxx,         (numeric) the transaction output amount in " + CURRENCY_UNIT + "\n"
-            "    \"confirmations\" : n,      (numeric) The number of notarized confirmations\n"
-            "    \"rawconfirmations\" : n,   (numeric) The number of confirmations\n"
-            "    \"redeemScript\" : n        (string) The redeemScript if scriptPubKey is P2SH\n"
-            "    \"spendable\" : xxx,        (bool) Whether we have the private keys to spend this output\n"
-            "    \"solvable\" : xxx,         (bool) Whether we know how to spend this output, ignoring the lack of keys\n"
-            "    \"safe\" : xxx              (bool) Whether this output is considered safe to spend. Unconfirmed transactions\n"
-            "                              from outside keys and unconfirmed replacement transactions are considered unsafe\n"
-            "                              and are not eligible for spending by fundrawtransaction and sendtoaddress.\n"
-            "  }\n"
-            "  ,...\n"
-            "]\n"
+            "2. \"address\"     (string) gamecredits address\n"
+            " \n"
 
             "\nExamples\n"
-            + HelpExampleCli("listunspent", "10000 ")
-            + HelpExampleCli("listunspent", "10000 6 9999999 \"[\\\"LGPYcOdyoBnraaWX5tknkJZZWafjRAGVzx\\\",\\\"LLmraTr3qBjE2YseA3CnZ55la4TQmWnRY3\\\"]\"")
-            + HelpExampleRpc("listunspent", "10000, 6, 9999999 \"[\\\"LGPYcOdyoBnraaWX5tknkJZZWafjRAGVzx\\\",\\\"LLmraTr3qBjE2YseA3CnZ55la4TQmWnRY3\\\"]\"")
-            + HelpExampleCli("listunspent", "10000 6 9999999 '[]' true '{ \"minimumAmount\": 0.005 }'")
-            + HelpExampleRpc("listunspent", "10000, 6, 9999999, [] , true, { \"minimumAmount\": 0.005 } ")
+            + HelpExampleCli("listunspent", "10000 \\\"LGPYcOdyoBnraaWX5tknkJZZWafjRAGVzx\\\"")
+            + HelpExampleRpc("listunspent", "10000, \\\"LGPYcOdyoBnraaWX5tknkJZZWafjRAGVzx\\\"")
         );
 
     CAmount nAmount = 100000;
@@ -2944,19 +2906,11 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
         nAmount = AmountFromValue(request.params[0].get_int());
     }
 
-    std::set<CBitcoinAddress> setAddress;
+    CBitcoinAddress setAddress;
     if (request.params.size() > 1 && !request.params[1].isNull()) {
-        RPCTypeCheckArgument(request.params[1], UniValue::VARR);
-        UniValue inputs = request.params[1].get_array();
-        for (unsigned int idx = 0; idx < inputs.size(); idx++) {
-            const UniValue& input = inputs[idx];
-            CBitcoinAddress address(input.get_str());
-            if (!address.IsValid())
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid gamecredits address: ")+input.get_str());
-            if (setAddress.count(address))
-                throw JSONRPCError(RPC_INVALID_PARAMETER, std::string("Invalid parameter, duplicated address: ")+input.get_str());
-           setAddress.insert(address);
-        }
+        CBitcoinAddress setAddress(request.params[1].get_str());
+        if (!setAddress.IsValid())
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid gamecredits address: ")+request.params[1].get_str());
     }
             
     int nMinDepth = 1;
@@ -2974,7 +2928,6 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
     
     bool include_unsafe = true;
     if (request.params.size() > 4 && !request.params[4].isNull()) {
-        RPCTypeCheckArgument(request.params[4], UniValue::VBOOL);
         include_unsafe = request.params[4].get_bool();
     }
 
