@@ -2909,8 +2909,8 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
 
     CTxDestination setAddress;
     if (request.params.size() > 1 && !request.params[1].isNull()) {
-        if (setAddress = DecodeDestination(request.params[1].get_str()))
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid gamecredits address: ")+request.params[1].get_str());
+        setAddress = DecodeDestination(request.params[1].get_str());
+        //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid gamecredits address: ")+request.params[1].get_str());
     }
             
     int nMinDepth = 1;
