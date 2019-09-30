@@ -2885,7 +2885,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
         return NullUniValue;
     }
 
-    if (request.fHelp || request.params.size() < 2)
+    if (request.fHelp)
         throw std::runtime_error(
             "dpowlistunspent ( minconf maxconf  [\"addresses\",...] [include_unsafe] [query_options])\n"
             "\nReturns array of one unspent transaction output\n"
@@ -2963,16 +2963,17 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
         const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
         bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
+        LogPrintf("we got one uxto\n");
         if (!fValidAddress || setAddress != address)
             continue;
-
+LogPrintf("we still got the uxto\n");
         UniValue entry(UniValue::VOBJ);
         entry.push_back(Pair("txid", out.tx->GetHash().GetHex()));
         entry.push_back(Pair("vout", out.i));
 
         if (fValidAddress) {
             entry.push_back(Pair("address", CBitcoinAddress(address).ToString()));
-
+LogPrintf("prepare output with the utxo\n");
             if (pwallet->mapAddressBook.count(address)) {
                 entry.push_back(Pair("account", pwallet->mapAddressBook[address].name));
             }
