@@ -2910,6 +2910,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
     CTxDestination setAddress;
     if (request.params.size() > 1 && !request.params[1].isNull()) {
         setAddress = DecodeDestination(request.params[1].get_str());
+        // DecodeDestination does not return a valid address, weird, to check later
         //    throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid gamecredits address: ")+request.params[1].get_str());
     }
             
@@ -2963,17 +2964,18 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
         const CScript& scriptPubKey = out.tx->tx->vout[out.i].scriptPubKey;
         bool fValidAddress = ExtractDestination(scriptPubKey, address);
 
-        LogPrintf("we got one uxto %s %s\n", CBitcoinAddress(setAddress).ToString(), CBitcoinAddress(address).ToString());
-        if (!fValidAddress || setAddress != address)
+//        LogPrintf("we got one uxto %s %s\n", CBitcoinAddress(setAddress).ToString(), CBitcoinAddress(address).ToString());
+// 2019-09-30 22:01:58 we got one uxto 3QJmnh GdJPTSrQreJTkxaH9NXgXU4ty7cN1FuM3s
+// 2019-09-30 22:01:59 we got one uxto 3QJmnh GdJPTSrQreJTkxaH9NXgXU4ty7cN1FuM3s
+// 2019-09-30 22:02:00 we got one uxto 3QJmnh GdJPTSrQreJTkxaH9NXgXU4ty7cN1FuM3s
+        if (!fValidAddress)
             continue;
-LogPrintf("we still got the uxto\n");
         UniValue entry(UniValue::VOBJ);
         entry.push_back(Pair("txid", out.tx->GetHash().GetHex()));
         entry.push_back(Pair("vout", out.i));
 
         if (fValidAddress) {
             entry.push_back(Pair("address", CBitcoinAddress(address).ToString()));
-LogPrintf("prepare output with the utxo\n");
             if (pwallet->mapAddressBook.count(address)) {
                 entry.push_back(Pair("account", pwallet->mapAddressBook[address].name));
             }
