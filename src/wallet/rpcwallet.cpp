@@ -2908,7 +2908,7 @@ UniValue dpowlistunspent(const JSONRPCRequest& request)
 
     CBitcoinAddress setAddress;
     if (request.params.size() > 1 && !request.params[1].isNull()) {
-        CBitcoinAddress setAddress(request.params[1].get_str());
+        setAddress = DecodeDestination(request.params[1].get_str());
         if (!setAddress.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid gamecredits address: ")+request.params[1].get_str());
     }
