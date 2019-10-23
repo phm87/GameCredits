@@ -91,7 +91,7 @@ public:
     void BlockDisconnected(const std::shared_ptr<const CBlock> &);
     void SetBestChain(const CBlockLocator &);
     void Inventory(const uint256 &);
-    void Broadcast(int64_t n1BestBlockTime, CConnman* connman);
+    void Broadcast(int64_t nBestBlockTime, CConnman* connman);
     void BlockChecked(const CBlock&, const CValidationState&);
     void NewPoWValidBlock(const CBlockIndex *, const std::shared_ptr<const CBlock>&);
 };
